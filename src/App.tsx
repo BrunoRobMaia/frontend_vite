@@ -1,8 +1,13 @@
+import { BrowserRouter } from "react-router-dom";
+import RoutesComponent from "./routes/route";
+
 function App() {
   return (
-    <>
-      <p>Template para usar vite</p>
-    </>
+    <BrowserRouter>
+      <div className="App">
+        <RoutesComponent />
+      </div>
+    </BrowserRouter>
   );
 }
 
