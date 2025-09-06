@@ -8,13 +8,13 @@ export const registerSchema = z
       .min(1, "Email obrigatório")
       .email("Formato do email inválido"),
     password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
-    confirmPassword: z
+    password_confirmation: z
       .string()
       .min(6, "Confirmação de senha deve ter pelo menos 6 caracteres"),
   })
-  .refine((data) => data.password === data.confirmPassword, {
+  .refine((data) => data.password === data.password_confirmation, {
     message: "As senhas não são iguais",
-    path: ["confirmPassword"],
+    path: ["password_confirmation"],
   });
 
 export type RegisterFormData = z.infer<typeof registerSchema>;

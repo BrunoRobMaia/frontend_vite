@@ -1,30 +1,46 @@
 // src/components/Button.tsx
 import type { ButtonProps } from "../../types";
 
+interface ExtendedButtonProps extends ButtonProps {
+  size?: "sm" | "md" | "lg";
+  fullWidth?: boolean;
+}
+
 export function Button({
   children,
   variant = "primary",
+  size = "md",
   isLoading = false,
   className = "",
   disabled = false,
+  fullWidth = false,
   ...props
-}: ButtonProps) {
+}: ExtendedButtonProps) {
   const baseClasses =
-    "w-full py-3 px-4 cursor-pointer rounded-lg font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 flex items-center justify-center";
+    "cursor-pointer rounded-lg font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 flex items-center justify-center";
 
   const variants = {
     primary: "bg-[#462ebd] hover:bg-[#312567] text-white",
     secondary: "bg-gray-200 hover:bg-gray-300 text-gray-800",
-    outline: "border border-[#462ebd] text-[#462ebd] hover:bg-[#462ebd] ",
+    outline:
+      "border border-[#462ebd] text-[#462ebd] hover:bg-[#462ebd] hover:text-white",
+  };
+
+  const sizes = {
+    sm: "px-3 py-1.5 text-sm",
+    md: "px-4 py-2 text-base",
+    lg: "px-6 py-3 text-lg",
   };
 
   return (
     <button
       disabled={disabled || isLoading}
       className={`
-        ${baseClasses} 
-        ${variants[variant]} 
-        ${disabled || isLoading ? "opacity-50 cursor-not-allowed" : ""} 
+        ${baseClasses}
+        ${fullWidth ? "w-full" : ""}
+        ${variants[variant]}
+        ${sizes[size]}
+        ${disabled || isLoading ? "opacity-50 cursor-not-allowed" : ""}
         ${className}
       `}
       {...props}
@@ -32,7 +48,7 @@ export function Button({
       {isLoading ? (
         <>
           <svg
-            className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+            className="animate-spin -ml-1 mr-2 h-5 w-5"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"

@@ -6,16 +6,19 @@ import useRegisterForm from "../../hooks/useRegisterForm";
 import { api } from "../../services/api";
 import { toast, Toaster } from "sonner";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export function Register() {
   const { register, handleSubmit, errors } = useRegisterForm();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState<boolean>(false);
 
   async function handleRegister(data: AuthFormData) {
     setLoading(true);
     try {
-      await api.post("/api/v1/register", data);
+      await api.post("/register", data);
       toast.success("Cadastro realizado com sucesso");
+      navigate("/login");
     } catch (err) {
       if (axios.isAxiosError(err)) {
         toast.error(
@@ -97,13 +100,13 @@ export function Register() {
                   type="password"
                   label="Confirmar senha"
                   placeholder="Confirme sua senha"
-                  {...register("confirmPassword")}
-                  error={errors.confirmPassword ? true : false}
+                  {...register("password_confirmation")}
+                  error={errors.password_confirmation ? true : false}
                   required
                 />
-                {errors.confirmPassword && (
+                {errors.password_confirmation && (
                   <p className="text-red-500 text-sm mt-1">
-                    {errors.confirmPassword.message}
+                    {errors.password_confirmation.message}
                   </p>
                 )}
               </div>
@@ -120,7 +123,8 @@ export function Register() {
                 Já tem uma conta?{" "}
                 <button
                   type="button"
-                  className="font-medium text-blue-600 hover:text-blue-500"
+                  className="font-medium text-blue-600 hover:text-blue-500 cursor-pointer"
+                  onClick={() => navigate("/login")}
                 >
                   Entre aqui
                 </button>

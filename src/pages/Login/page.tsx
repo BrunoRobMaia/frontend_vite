@@ -1,32 +1,27 @@
 import { useState } from "react";
-import { Input } from "../../components/Input";
-import { Button } from "../../components/Button";
-import useAuthForm from "../../hooks/useAuthForm";
-import type { AuthFormData } from "../../schema/authSchema";
-import { api } from "../../services/api";
+import { Input } from "@/components/Input";
+import { Button } from "@/components/Button";
+import useAuthForm from "@/hooks/useAuthForm";
+import type { AuthFormData } from "@/schema/authSchema";
 import { toast, Toaster } from "sonner";
-import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/authHook";
 
 export function Login() {
   const { handleSubmit, register, errors } = useAuthForm();
+  const { signIn } = useAuth();
+  const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
 
   async function handleLogin(data: AuthFormData) {
     setLoading(true);
     try {
-      await api.post("/api/v1/login", data);
+      await signIn(data.email, data.password);
       toast.success("Login realizado com sucesso");
-    } catch (err) {
-      if (axios.isAxiosError(err)) {
-        toast.error(
-          err.response?.data?.message || "Ocorreu um erro ao realizar o login"
-        );
-      } else {
-        toast.error(
-          "Erro inesperado na aplicação, entre em contato com o suporte"
-        );
-      }
+      navigate("/");
+    } catch (err: any) {
+      toast.error(err.message || "Ocorreu um erro ao realizar o login");
     } finally {
       setLoading(false);
     }
@@ -71,26 +66,12 @@ export function Login() {
               )}
             </div>
 
-            <div className="flex items-center justify-between">
-              <label className="flex items-center space-x-2">
-                <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                <span className="text-sm text-gray-900">Lembrar-me</span>
-              </label>
-
-              <a
-                href="#"
-                className="text-sm font-medium text-blue-600 hover:text-blue-500"
-              >
-                Esqueceu sua senha?
-              </a>
-            </div>
-
-            <Button type="submit" variant="primary" isLoading={loading}>
+            <Button
+              type="submit"
+              variant="primary"
+              isLoading={loading}
+              fullWidth
+            >
               Entrar
             </Button>
 
@@ -99,7 +80,8 @@ export function Login() {
                 Não tem uma conta?{" "}
                 <button
                   type="button"
-                  className="font-medium text-blue-600 hover:text-blue-500"
+                  className="font-medium text-blue-600 hover:text-blue-500 cursor-pointer"
+                  onClick={() => navigate("/register")}
                 >
                   Cadastre-se
                 </button>
