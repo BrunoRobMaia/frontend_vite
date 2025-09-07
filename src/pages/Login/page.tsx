@@ -6,13 +6,19 @@ import type { AuthFormData } from "@/schema/authSchema";
 import { toast, Toaster } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/authHook";
+import { Eye, EyeOff } from "lucide-react"; // Importe ícones para mostrar/ocultar
 
 export function Login() {
   const { handleSubmit, register, errors } = useAuthForm();
   const { signIn } = useAuth();
   const navigate = useNavigate();
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   async function handleLogin(data: AuthFormData) {
     setLoading(true);
@@ -52,18 +58,28 @@ export function Login() {
                 </p>
               )}
 
-              <Input
-                type="password"
-                label="Senha"
-                placeholder="Sua senha"
-                {...register("password")}
-                error={errors.password ? true : false}
-              />
-              {errors.password && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.password.message}
-                </p>
-              )}
+              <div className="relative">
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  label="Senha"
+                  placeholder="Sua senha"
+                  {...register("password")}
+                  error={errors.password ? true : false}
+                  required
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 pt-6"
+                  onClick={togglePasswordVisibility}
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+                {errors.password && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.password.message}
+                  </p>
+                )}
+              </div>
             </div>
 
             <Button

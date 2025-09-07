@@ -12,6 +12,7 @@ import { api } from "@/services/api";
 import { toast } from "sonner";
 import type { SuggestionFormData } from "@/schema/suggestSchema";
 import useSuggestForm from "@/hooks/useSuggestForm";
+import { useState } from "react";
 
 interface Props {
   open: boolean;
@@ -20,13 +21,22 @@ interface Props {
 
 export function AddSuggestModal({ open, onClose }: Props) {
   const { register, handleSubmit, errors, reset } = useSuggestForm();
+  const [loading, setLoading] = useState<boolean>(false);
   async function handleAddSuggestion(data: SuggestionFormData) {
     try {
-      await api.post("/api/v1/suggestions", data);
+      setLoading(true);
+      await api.post("/suggestions", data, {
+        headers: {
+          contentType: "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
       toast.success("Sugestão enviada com sucesso! Aguarde a aprovação.");
       onClose?.();
     } catch (err) {
       toast.error("Erro ao enviar sugestão");
+    } finally {
+      setLoading(false);
     }
   }
   const handleOpenChange = () => {
@@ -45,19 +55,6 @@ export function AddSuggestModal({ open, onClose }: Props) {
             >
               <Input
                 type="text"
-                label="Título da Música"
-                placeholder="Ex: Pagode em Brasília"
-                {...register("title")}
-                error={errors.title ? true : false}
-              />
-              {errors.title && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.title.message}
-                </p>
-              )}
-
-              <Input
-                type="url"
                 label="Link do YouTube"
                 placeholder="https://www.youtube.com/watch?v=..."
                 {...register("youtube_url")}
@@ -69,25 +66,18 @@ export function AddSuggestModal({ open, onClose }: Props) {
                 </p>
               )}
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Descrição (opcional)
-                </label>
-                <textarea
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  rows={3}
-                  placeholder="Alguma observação sobre esta música..."
-                  {...register("description")}
-                />
-              </div>
-
               <div className="flex justify-end space-x-4">
                 <DialogClose asChild>
                   <Button type="button" variant="outline" size="sm">
                     Cancelar
                   </Button>
                 </DialogClose>
-                <Button type="submit" variant="primary" size="sm">
+                <Button
+                  type="submit"
+                  variant="primary"
+                  size="sm"
+                  isLoading={loading}
+                >
                   Enviar Sugestão
                 </Button>
               </div>

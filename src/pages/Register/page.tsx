@@ -7,11 +7,15 @@ import { api } from "../../services/api";
 import { toast, Toaster } from "sonner";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react"; // Importe ícones para mostrar/ocultar
 
 export function Register() {
   const { register, handleSubmit, errors } = useRegisterForm();
   const navigate = useNavigate();
   const [loading, setLoading] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [showConfirmPassword, setShowConfirmPassword] =
+    useState<boolean>(false);
 
   async function handleRegister(data: AuthFormData) {
     setLoading(true);
@@ -34,6 +38,14 @@ export function Register() {
       setLoading(false);
     }
   }
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
 
   return (
     <>
@@ -80,30 +92,52 @@ export function Register() {
                   </p>
                 )}
               </div>
-              <div>
+
+              {/* Campo de Senha com toggle */}
+              <div className="relative">
                 <Input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   label="Senha"
                   placeholder="Sua senha"
                   {...register("password")}
                   error={errors.password ? true : false}
                   required
                 />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 pt-6"
+                  onClick={togglePasswordVisibility}
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
                 {errors.password && (
                   <p className="text-red-500 text-sm mt-1">
                     {errors.password.message}
                   </p>
                 )}
               </div>
-              <div>
+
+              {/* Campo de Confirmar Senha com toggle */}
+              <div className="relative">
                 <Input
-                  type="password"
+                  type={showConfirmPassword ? "text" : "password"}
                   label="Confirmar senha"
                   placeholder="Confirme sua senha"
                   {...register("password_confirmation")}
                   error={errors.password_confirmation ? true : false}
                   required
                 />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 pt-6"
+                  onClick={toggleConfirmPasswordVisibility}
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff size={20} />
+                  ) : (
+                    <Eye size={20} />
+                  )}
+                </button>
                 {errors.password_confirmation && (
                   <p className="text-red-500 text-sm mt-1">
                     {errors.password_confirmation.message}
@@ -113,7 +147,12 @@ export function Register() {
             </div>
 
             <div>
-              <Button type="submit" variant="primary" isLoading={loading}>
+              <Button
+                type="submit"
+                variant="primary"
+                isLoading={loading}
+                fullWidth
+              >
                 Cadastrar
               </Button>
             </div>

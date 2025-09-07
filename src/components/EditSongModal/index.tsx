@@ -9,50 +9,54 @@ import {
 import { Button } from "../Button";
 import { Input } from "../Input";
 import useSongForm from "@/hooks/useSongForm";
-import type { SongFormData } from "@/schema/songSchema";
+import type { Song, SongFormData } from "@/schema/songSchema";
 import { api } from "@/services/api";
 import { toast } from "sonner";
+import { useEffect } from "react";
 interface Props {
+  songData: Song;
+  songId: number;
   open: boolean;
   onClose: VoidFunction;
-  onSuccess: VoidFunction;
 }
 
-export function AddSongModal({ open, onClose, onSuccess }: Props) {
-  const { register, handleSubmit, errors, reset } = useSongForm();
+export function EditSongModal({ open, onClose, songData, songId }: Props) {
+  const { register, handleSubmit, errors, setValue } = useSongForm();
 
-  const handleOpenChange = () => {
+  function handleOpenChange() {
     onClose?.();
-  };
+  }
 
-  async function handleAddMusic(data: SongFormData) {
-    const dataFormated = {
-      ...data,
-      play_count: Number(data.play_count.replace(/\./g, "")),
-    };
-
+  async function handleEditMusic(data: SongFormData) {
     try {
-      await api.post("/songs", dataFormated, {
+      await api.put(`/songs/${songId}`, data, {
         headers: {
           contentType: "application/json",
           authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
-      toast.success("Música adicionada com sucesso");
+      toast.success("Música editada com sucesso");
       onClose();
-      reset();
-      onSuccess();
     } catch (err) {
-      toast.error("Erro ao adicionar música");
+      toast.error("Erro ao editar música");
     }
   }
+  useEffect(() => {
+    setValue("title", songData.title);
+    setValue("youtube_url", songData.youtube_url);
+    setValue("play_count", songData.play_count);
+  }, [songData, setValue, songId, open]);
+
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Adicionar música</DialogTitle>
+          <DialogTitle>Editar música</DialogTitle>
           <DialogDescription>
-            <form className="space-y-4" onSubmit={handleSubmit(handleAddMusic)}>
+            <form
+              className="space-y-4"
+              onSubmit={handleSubmit(handleEditMusic)}
+            >
               <Input
                 type="text"
                 label="Título"
@@ -78,19 +82,12 @@ export function AddSongModal({ open, onClose, onSuccess }: Props) {
                   {errors.youtube_url.message}
                 </p>
               )}
+
               <Input
-                type="text"
+                type="string"
                 label="Contagem de Reproduções"
                 placeholder="0"
-                {...register("play_count", {
-                  onChange: (e) => {
-                    let value = e.target.value.replace(/\D/g, "");
-
-                    value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-
-                    e.target.value = value;
-                  },
-                })}
+                {...register("play_count")}
                 error={errors.play_count ? true : false}
               />
               {errors.play_count && (
@@ -106,7 +103,7 @@ export function AddSongModal({ open, onClose, onSuccess }: Props) {
                   </Button>
                 </DialogClose>
                 <Button type="submit" variant="primary" size="sm">
-                  Adicionar
+                  Editar
                 </Button>
               </div>
             </form>

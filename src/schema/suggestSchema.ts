@@ -13,7 +13,5 @@ export const suggestionSchema = z.object({
     .string()
     .url("URL inválida")
     .regex(/youtube\.com|youtu\.be/, "Deve ser um link do YouTube"),
-  title: z.string().min(1, "Título é obrigatório"),
-  description: z.string().optional(),
 });
 export type SuggestionFormData = z.infer<typeof suggestionSchema>;
