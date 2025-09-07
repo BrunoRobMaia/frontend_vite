@@ -13,7 +13,7 @@ export function Header() {
 
   function handleLogout() {
     signOut();
-    navigate("/login");
+    navigate("/");
   }
 
   return (
@@ -31,7 +31,7 @@ export function Header() {
                 {user.name}
               </span>
             </div>
-            <Button onClick={handleLogout} variant="outline" size="sm">
+            <Button onClick={handleLogout} variant="outline">
               <BiLogOut className="text-lg" />
               Sair
             </Button>

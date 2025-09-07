@@ -1,13 +1,21 @@
 import type { Song } from "@/schema/songSchema";
-import { BiEdit } from "react-icons/bi";
+import { BiDotsHorizontalRounded, BiEdit, BiTrash } from "react-icons/bi";
 import { EditSongModal } from "../EditSongModal";
 import { useState } from "react";
-
+import { useAuth } from "@/hooks/authHook";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { api } from "@/services/api";
+import { toast } from "sonner";
 interface Props {
   song: Song;
 }
 
 export function SongsCard({ song }: Props) {
+  const { user } = useAuth();
   const [editModal, setEditModal] = useState<boolean>(false);
   const videoId = song.youtube_url.split("v=")[1]?.split("&")[0];
   const thumbnail = videoId
@@ -20,6 +28,16 @@ export function SongsCard({ song }: Props) {
 
   function closeEditModal() {
     setEditModal(false);
+  }
+
+  async function handleDeleteSong(id: number) {
+    try {
+      await api.delete(`/songs/${id}`);
+      toast.success("Música deletada com sucesso");
+      window.location.reload();
+    } catch (err) {
+      toast.error("Erro ao deletar música");
+    }
   }
 
   return (
@@ -67,12 +85,38 @@ export function SongsCard({ song }: Props) {
             </span>
           </div>
           <div className="flex text-xs mt-1 flex-col">
-            <div
-              onClick={openEditModal}
-              className="cursor-pointer flex justify-end"
-            >
-              <BiEdit size={20} />
-            </div>
+            {user && (
+              <Popover>
+                <PopoverTrigger>
+                  <div className="flex justify-end cursor-pointer">
+                    <BiDotsHorizontalRounded size={20} />
+                  </div>
+                </PopoverTrigger>
+                <PopoverContent
+                  className="flex flex-col gap-2 w-[130px]"
+                  side="bottom"
+                  align="end"
+                >
+                  <div
+                    onClick={openEditModal}
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
+                    <BiEdit size={20} />
+                    <p>Editar</p>
+                  </div>
+                  <div
+                    className="flex items-center gap-2 cursor-pointer"
+                    onClick={() => handleDeleteSong(song.id)}
+                  >
+                    <BiTrash
+                      size={20}
+                      className="cursor-pointer text-red-500"
+                    />
+                    <p>Deletar</p>
+                  </div>
+                </PopoverContent>
+              </Popover>
+            )}
             <span>
               📅 {new Date(song.created_at).toLocaleDateString("pt-BR")}
             </span>

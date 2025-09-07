@@ -6,8 +6,10 @@ import type { Song } from "@/schema/songSchema";
 import { api } from "@/services/api";
 import { toast } from "sonner";
 import { AddSongModal } from "../AddSongModal";
+import { useAuth } from "@/hooks/authHook";
 
 export function SongTab() {
+  const { user } = useAuth();
   const [songs, setSongs] = useState<Song[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [songModal, setSongModal] = useState<boolean>(false);
@@ -88,9 +90,11 @@ export function SongTab() {
           <h2 className="text-2xl font-bold text-gray-900">
             Gerenciar Músicas
           </h2>
-          <Button variant="primary" onClick={openSongModal}>
-            Adicionar Música
-          </Button>
+          {user && (
+            <Button variant="primary" onClick={openSongModal}>
+              Adicionar Música
+            </Button>
+          )}
         </div>
 
         {loading ? (
@@ -107,7 +111,7 @@ export function SongTab() {
           </div>
         )}
         <Pagination
-          totalItems={totalCount} // Usar totalCount em vez de songs.length
+          totalItems={totalCount}
           currentPage={page}
           itemsPerPage={limitPage}
           prev={handlePreviusPage}

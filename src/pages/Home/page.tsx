@@ -3,11 +3,14 @@ import { Toaster } from "sonner";
 import { Header } from "@/components/Header";
 import { SongTab } from "@/components/SongTab";
 import { SuggestionTab } from "@/components/SuggestionTab";
+import { useAuth } from "@/hooks/authHook";
 
 export function AdminPage() {
   const [activeTab, setActiveTab] = useState<"musicas" | "sugestoes">(
     "musicas"
   );
+
+  const { user } = useAuth();
 
   return (
     <>
@@ -27,16 +30,19 @@ export function AdminPage() {
               >
                 Músicas
               </button>
-              <button
-                onClick={() => setActiveTab("sugestoes")}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === "sugestoes"
-                    ? "border-[#462ebd] hover:border-[#312567] text-[#462ebd] cursor-pointer"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 cursor-pointer"
-                }`}
-              >
-                Sugestões
-              </button>
+
+              {user && (
+                <button
+                  onClick={() => setActiveTab("sugestoes")}
+                  className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                    activeTab === "sugestoes"
+                      ? "border-[#462ebd] hover:border-[#312567] text-[#462ebd] cursor-pointer"
+                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 cursor-pointer"
+                  }`}
+                >
+                  Sugestões
+                </button>
+              )}
             </nav>
           </div>
         </div>
@@ -44,7 +50,7 @@ export function AdminPage() {
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {activeTab === "musicas" && <SongTab />}
 
-          {activeTab === "sugestoes" && <SuggestionTab />}
+          {activeTab === "sugestoes" && user && <SuggestionTab />}
         </main>
       </div>
     </>
